@@ -8,16 +8,15 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
 const transporter = nodemailer.createTransport({
-  pool: true, 
+  pool: true,
   service: "gmail",
   auth: {
     user: "prashantthakur0128@gmail.com",
     pass: "hpuv dahr novt xkzt" 
   },
   maxConnections: 3,
-  maxMessages: 100,  
+  maxMessages: 100,
 });
 
 app.post("/contact", (req, res) => {
@@ -43,16 +42,13 @@ app.post("/contact", (req, res) => {
     `
   };
 
-
-  res.status(200).send({ success: true, message: "Message received! Sending in background..." });
-
-
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.error("❌ Email failed:", error);
-    } else {
-      console.log("✅ Email sent:", info.response);
+      console.error("❌ Email sending failed:", error);
+      return res.status(500).json({ success: false, message: "Failed to send message" });
     }
+    console.log("✅ Email sent:", info.response);
+    return res.status(200).json({ success: true, message: "Message sent successfully" });
   });
 });
 
